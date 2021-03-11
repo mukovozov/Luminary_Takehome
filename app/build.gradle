@@ -1,17 +1,21 @@
+import cvdevelopers.takehome.buildSrc.Libs
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "27.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "cvdevelopers.githubstalker"
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -23,12 +27,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-}
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
 
-ext {
-    daggerVersion = "2.27"
-    jsr305Version = "3.0.1"
-    supportLibraryVersion = '1.1.0'
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 repositories {
@@ -37,29 +43,54 @@ repositories {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api "com.jakewharton:butterknife:$butterknife_version"
-    kapt "com.jakewharton:butterknife-compiler:$butterknife_version"
 
-    api "com.google.dagger:dagger-android-support:$daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    implementation(
+            Libs.Dagger.core,
+            Libs.Kotlin.stdlib,
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+            Libs.Network.Retrofit.core,
+            Libs.Network.Retrofit.rxJavaAdapter,
+            Libs.Network.Retrofit.moshiAdapter,
+            Libs.Network.rxJava,
+            Libs.Network.rxAndroid,
+            Libs.Network.Moshi.core,
+
+            Libs.AndroidX.coreKtx,
+            Libs.AndroidX.constraintLayout,
+            Libs.AndroidX.recyclerView,
+            Libs.AndroidX.swipeRefreshLayout,
+            Libs.AndroidX.Lifecycle.liveData,
+            Libs.AndroidX.Lifecycle.viewModel,
+            Libs.AndroidX.multidex,
+            Libs.AndroidX.Room.runtime,
+            Libs.AndroidX.Room.rxJavaSupport,
+
+            Libs.Debugging.timber,
+
+            Libs.Ui.picasso,
+            Libs.Ui.Groupie.core,
+            Libs.Ui.Groupie.binding
+
+    )
+    kapt(
+            Libs.Dagger.compiler,
+            Libs.Dagger.annotationProcessor,
+            Libs.Network.Moshi.codegen,
+            Libs.AndroidX.Room.compiler
+    )
 
     androidTestApi('androidx.test.espresso:espresso-core:3.1.0-alpha4', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs'
     })
 
-    api "androidx.appcompat:appcompat:$supportLibraryVersion"
-    api "androidx.recyclerview:recyclerview:$supportLibraryVersion"
-//    api "androidx.legacy:legacy-support-v4:$supportLibraryVersion"
-    api 'androidx.constraintlayout:constraintlayout:1.1.3'
-    api 'com.squareup.retrofit2:retrofit:2.6.0'
-    api 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
-    api 'com.squareup.retrofit2:converter-gson:2.3.0'
-    api 'com.squareup.picasso:picasso:2.5.2'
-    api 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    testImplementation(
+            Libs.Testing.junit,
+            Libs.Testing.archCore,
+            Libs.Testing.assertJ,
+            Libs.Testing.Mockito.core,
+            Libs.Testing.Mockito.inline,
+            Libs.Testing.Mockito.kotlin
 
-    testImplementation 'junit:junit:4.12'
+    )
 }

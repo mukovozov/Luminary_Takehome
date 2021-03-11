@@ -1,22 +1,24 @@
 package cvdevelopers.takehome
 
-import android.app.Application
-import cvdevelopers.takehome.dagger.ApplicationComponent
-import cvdevelopers.takehome.dagger.ApplicationModule
-import cvdevelopers.takehome.dagger.DaggerApplicationComponent
+import androidx.multidex.MultiDexApplication
+import cvdevelopers.takehome.dagger.app.ApplicationComponent
+import cvdevelopers.takehome.dagger.DaggerApplication
+import timber.log.Timber
 
-class LuminaryTakeHomeApplication : Application() {
+class LuminaryTakeHomeApplication : MultiDexApplication(), DaggerApplication {
 
-    val appComponent: ApplicationComponent by lazy {
-        DaggerApplicationComponent
-                .builder()
-                .applicationModule(ApplicationModule(this))
-                .build()
-    }
+    lateinit var appComponent: ApplicationComponent
 
     override fun onCreate() {
         super.onCreate()
-        appComponent.inject(this);
+        initDi()
+        Timber.plant(Timber.DebugTree())
     }
 
+    override fun getApplicationComponent() = appComponent
+
+    private fun initDi() {
+        appComponent = ApplicationComponent.Initializer.init(this)
+        appComponent.inject(this)
+    }
 }

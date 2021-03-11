@@ -1,9 +1,13 @@
 package cvdevelopers.takehome.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.squareup.moshi.JsonClass
 
-import com.google.gson.annotations.SerializedName
-
+@JsonClass(generateAdapter = true)
+@Entity
 data class Id(
+    @PrimaryKey
     val name: String,
-    val value: String
+    val value: String?
 )

@@ -1,6 +1,6 @@
 package cvdevelopers.takehome.models
 
-data class ApiResponse (
-    val results: List<Client>
-){
-}
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class ApiResponse(val results: List<Client>)
