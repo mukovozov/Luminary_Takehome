@@ -3,6 +3,7 @@ package cvdevelopers.takehome.repository
 import cvdevelopers.takehome.api.RandomUserApiEndpoint
 import cvdevelopers.takehome.database.ClientDao
 import cvdevelopers.takehome.models.Client
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
@@ -17,19 +18,23 @@ class ClientListRepositoryImpl @Inject constructor(
 
     override fun getUsers(shouldRefreshCache: Boolean): Single<List<Client>> {
         return if (shouldRefreshCache) {
-            loadClients()
+            loadClientsFromApi()
                 .doOnSuccess(dao::updateClients)
         } else {
-            Single.concat(dao.getClients(), loadClients())
+            Maybe.concat(loadClientsFromDb(), loadClientsFromApi().toMaybe())
                 .firstElement()
                 .toSingle()
         }
     }
 
     // I thought that pagination will be fine here, but I didn't see requirement in ReadMe.
-    private fun loadClients(): Single<List<Client>> {
+    private fun loadClientsFromApi(): Single<List<Client>> {
         return api.getClients("1")
             .map { it.results }
             .doOnSuccess(dao::addClients)
+    }
+
+    private fun loadClientsFromDb(): Maybe<List<Client>> {
+        return dao.getClients().filter { it.isNotEmpty() }
     }
 }
